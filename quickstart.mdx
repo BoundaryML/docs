@@ -5,7 +5,14 @@ description: Start building with Gloo in 5 minutes
 
 Gloo allows developers to build, test and deploy powerful LLM apps using a task-based (aka "function-based") architecture.
 
-In order for any chatbot or LLM-powered app to interface with your existing code, you need to be able to mold its output into a structured format your program can understand. Rather than defining all these input and output schemas yourself, Gloo helps you achieve this in a couple simple steps.
+In order for any chatbot or LLM-powered app to interface with your existing code, you need to be able to mold its output into a structured format your program can understand.
+
+<Tip>
+  An AI agent that uses "tools" is really just performing a classification task.
+  The input is a question, and the output is a list of tools. This is just one
+  example. Gloo allows you to define tasks like these in very simple steps, and
+  in the future, use the LLM-generated data to train specialized models.
+</Tip>
 
 Gloo consists of the following parts:
 
@@ -70,7 +77,7 @@ Below we go over each of these functions and what they do.
 
 <Card title="Task.py" icon="lightbulb" iconType="duotone" color="#0aeb04">
 
-In general, view the `tasks.yaml` as a definition of _what_ tasks are, and the generated `task.py` files as definitions for _how_ they are executed. In the case of LLM apps, the "how" is done using prompt engineering, and custom LLM models or providers. You can see both are defined in the next example.
+In general, view the `tasks.yaml` as a definition of _what_ tasks are, and the generated `task.py` files as definitions for _how_ they are executed. In the case of LLM apps, the "how" is done using prompt engineering and a combination of different LLM model parameters like temperature, etc. You can see both are defined in the next example.
 
 </Card>
 

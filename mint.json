@@ -9,9 +9,9 @@
   "colors": {
     "primary": "#8b5cf6",
     "light": "#a5b4fc",
-    "dark": "#0D001D",
+    "dark": "#020617",
     "background": {
-      "dark": "#0f172a"
+      "dark": "#020617"
     },
     "anchors": {
       "from": "#FF7F57",
