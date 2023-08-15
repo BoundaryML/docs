@@ -111,7 +111,7 @@ Which translates to this JSON:
 
 We now edit the prompt so our LLM actually spits out that output format.
 
-```python
+```python task.py
   class search(GlooLLMTaskInterface):
      # ...
 
@@ -209,7 +209,7 @@ We will change the clues property in these ways:
 1. Change the name to "hints" in the prompt
 2. Add more information about what type of clues to retrieve.
 
-```python
+```python task.py
 class search(...)
   def edit_types_json_converter(self) -> search__Description:
     return {
