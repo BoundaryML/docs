@@ -30,15 +30,20 @@ In this guide we will walk through how you can build a semantic search task usin
 1. Install npx: `npm install -g npx`, which can run the Gloo CLI without installing it globally
 1. Run `npx @gloo-ai/client --version`, and if you see the version you're now ready to go.
 
-### Step 1: Add a tasks.yaml file to your project.
+### Step 1: Add the task to a tasks.yaml file
 
 The `tasks.yaml` is a definition of all, or a subset of tasks you want your program to perform using generative models. You can think of each task as the equivalent of an LLM prompt with a specific instruction and an output schema.
+
+This file can have many different tasks (e.g. summarize, translate, classify), that you can run in sequence (or in parallel) to make an LLM "pipeline" (aka an AI agent).
 
 ```yaml project/tasks/tasks.yaml
 tasks:
   SearchDocuments:
     input: SearchInput
     output: SearchOutput
+  # You could add more tasks here
+  # Summarize...
+  #   input: ....
 
 types:
   ## Search
@@ -50,6 +55,8 @@ types:
     reasoning: string
     answer: string
 ```
+
+Each input and output maps to a `type` defined in the `types` section.
 
 ### Generate your Task Definitions
 
@@ -69,6 +76,12 @@ tasks/
       task.py
       test.py # Coming soon
 ```
+
+<Warning>
+  You must run this CLI anytime you change the tasks.yaml file. The CLI will
+  automatically create a new version of your task.py if it detects your new yaml
+  is incompatible with the existing task.py.
+</Warning>
 
 ### Edit your generated Task Definition
 
