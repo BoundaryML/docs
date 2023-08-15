@@ -38,5 +38,9 @@
   "footerSocials": {
     "twitter": "https://twitter.com/trygloo",
     "github": "https://github.com/GlooHQ"
+  },
+  "modeToggle": {
+    "default": "light",
+    "isHidden": false
   }
 }

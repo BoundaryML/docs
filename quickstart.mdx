@@ -88,14 +88,6 @@ tasks/
 Now we can edit the generated `task.py`. At a glance, you will see a lot of commented out functions.
 Below we go over each of these functions and what they do.
 
-<Card title="Task.py" icon="lightbulb" iconType="duotone" color="#0aeb04">
-
-In general, view the `tasks.yaml` as a definition of _what_ tasks are, and the generated `task.py` files as definitions for _how_ they are executed. In the case of LLM apps, the "how" is done using prompt engineering and a combination of different LLM model parameters like temperature, etc. You can see both are defined in the next example.
-
-</Card>
-
-#### Modify the prompt
-
 We will leverage the input variables defined in `task.yaml` schema to build our prompt, and we will ensure the output instructions can output the schema we desire.
 
 Recall that for our **Search** task the desired output schema is:
@@ -117,7 +109,7 @@ Which translates to this JSON:
 }
 ```
 
-Now we can edit the prompt and ensure our task actually spits out that output.
+We now edit the prompt so our LLM actually spits out that output format.
 
 ```python
   class search(GlooLLMTaskInterface):
@@ -164,7 +156,13 @@ Output in the following format:
 ```
 
 All of these variable substitutions are tracked by Gloo and can be tracked individually in the dashboard. Gloo will let you use this data to dive deep into potential issues caused by specific sections of your prompt. I.e. you could narrow down which part of your prompt causes the most impact in generating good or bad responses.
--- add dashboard link here --
+-- (dashboard link) --
+
+<Card title="Task.py" icon="lightbulb" iconType="duotone" color="#0aeb04">
+
+In general, view the `tasks.yaml` as a definition of _what_ tasks are, and the generated `task.py` files as definitions for _how_ they are executed. In the case of LLM apps, the "how" is done using prompt engineering and a combination of different LLM model parameters like temperature, etc. You can see both are defined in the next example.
+
+</Card>
 
 ### Run the task
 
@@ -204,9 +202,12 @@ To experiment with this... -TODO-
 
 #### 2. Use the Output -> JSON converter to define a custom description.
 
-Gloo comes with a built-in function called `edit_types_json_converter` that allows you to define the output format "description" -- in this case it returns a **`search__Description`**. Here we can define more custom descriptions for what `clues` means that goes beyond the simple type of this field.
+Gloo comes with a built-in function called `edit_types_json_converter` that allows you to define the output format "description" and use it in your prompt.
 
-In the example below, we declare a custom description for `clues` that changes the name to "hints", and refer to it in the prompt definition. Note that even though we changed the name of this field, from a programmatic POV you will still get a model output with a field containing `output.clues`.
+We will change the clues property in these ways:
+
+1. Change the name to "hints" in the prompt
+2. Add more information about what type of clues to retrieve.
 
 ```python
 class search(...)
@@ -239,7 +240,9 @@ class search(...)
     '''
 ```
 
-This will generate a prompt string that looks like:
+Note we refer to the description using the variable: `{VARS.out_SearchOutput.clues.desc}`. Gloo gives you a reference to all your input and output variables, as well as their descriptions.
+
+Now that we've finished the edit, our prompt will now have the custom description and name.
 
 ```string
 ...
@@ -250,3 +253,9 @@ This will generate a prompt string that looks like:
 }
 ...
 ```
+
+Even though this property is called "hints" in the prompt, the actual output of this task will contain a "clues" property (what was defined in our `tasks.yaml`). This allows you to prompt engineer more easily without having to change all your variable names all the time.
+
+## Testing
+
+(TODO)
