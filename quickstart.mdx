@@ -117,6 +117,11 @@ The following is an **LLM Variant** that prompts the model to take a string and 
 
 To run a function in your code you have to import it from the generated folder. The generated folder is where the Gloo CLI translates your GlooLang files into runnable Python code.
 
+<Note>
+  The generated functions are async by default. You can use asyncio to make them
+  run synchronously{" "}
+</Note>
+
 <img src="/images/running-yourself.png" />
 
 Press `control + space` on VSCode to get suggestions for all the functions you can run.
