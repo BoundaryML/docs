@@ -167,6 +167,8 @@ On GlooLang, you can write in-line python code using the **@lang[py]** identifie
 
 ### Prompt engineering on Gloo
 
+#### Basic example
+
 The prompt can take a multi-line string inside a \{\} block. No need to escape common characters like quotes. If you want to escape a curly brace, use \{\{ and \}\}.
 
 The prompt can leverage two special variables, the **@input** and **@output**.
@@ -182,3 +184,8 @@ See the below Example for a prompt defined inside an @variant\[llm\] for a funct
 and the end result
 
 <img src="/images/extract-verbs/extract-verbs-prompt-dash.png" />
+
+#### Modifying the output schema descriptions
+
+LLMs can use descriptions to figure out what to inject into each field in your output schema. In GlooLang we can accomplish
+this by using the @stringify keyword, which only works on the Function's @output types.
