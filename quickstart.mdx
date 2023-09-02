@@ -1,261 +1,184 @@
----
-title: "Quickstart"
-description: Start building with Gloo in 5 minutes
----
+## What is Gloo?
 
-Gloo allows developers to build, test and deploy powerful LLM apps using a task-based (aka "function-based") architecture.
+Gloo is a toolkit that allows you to build and monitor LLM (or other ML model) pipelines using a **function-based** architecture, where every call to a model has a defined input and output schema. Gloo uses a unique language (GlooLang) to build your LLM functions in a few lines of code.
 
-In order for any chatbot or LLM-powered app to interface with your existing code, you need to be able to mold its output into a structured format your program can understand.
+If you’re building a chatbot, or any LLM application Gloo is a good way to decompose your task into specific observable tasks (classification, entity extraction, etc).
 
-<Tip>
-  An AI agent that uses "tools" is really just performing a classification task.
-  The input is a question, and the output is a list of tools. This is just one
-  example. Gloo allows you to define tasks like these in very simple steps, and
-  in the future, use the LLM-generated data to train specialized models.
-</Tip>
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/fpWbMp6jz0U?si=Dn56Mp_PlBaQ9YzB"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen
+></iframe>
 
 Gloo consists of the following parts:
 
-1. **Gloo CLI**
-2. **Gloo Task Definitions**
-3. **Gloo Dashboard + Data** warehouse to view tests, or query your data to train your own models.
+1. **Gloo Lang -** Human-readable schema designed to declare your LLM functions and their inputs and outputs.
+2. **Gloo Intellisense VSCode Extension -** Enables GlooLang intellisense in VSCode
+3. **Gloo CLI -** Builds gloo-lang files into executable functions for Python (and soon Typescript).
+4. **Gloo Dashboard -** A dashboard where you can see Gloo-generated telemetry, like function call failure rates, etc.
 
-## Building a semantic search task
+### Example Schema
 
-In this guide we will walk through how you can build a semantic search task using Gloo.
+Example Gloo Schema for a sentiment classifier using an LLM
 
-#### Prerequisites:
+<img src="/images/classify-sentiment-bool-llm-variant.png" />
 
-1. Install [Node + NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-1. Install npx: `npm install -g npx`, which can run the Gloo CLI without installing it globally
-1. Run `npx @gloo-ai/client --version`, and if you see the version you're now ready to go.
+(See sections below to learn how it works)
 
-### Step 1: Add the task to a tasks.yaml file
+Gloo saves hundreds of lines of code in telemetry, serialization and deserialization logic.
 
-The `tasks.yaml` is a definition of all, or a subset of tasks you want your program to perform using generative models. You can think of each task as the equivalent of an LLM prompt with a specific instruction and an output schema.
+## Getting started
 
-This file can have many different tasks (e.g. summarize, translate, classify), that you can run in sequence (or in parallel) to make an LLM "pipeline" (aka an AI agent).
+### Pre-requirements
 
-```yaml project/tasks/tasks.yaml
-tasks:
-  SearchDocuments:
-    input: SearchInput
-    output: SearchOutput
-  # You could add more tasks here
-  # Summarize...
-  #   input: ....
+Currently Gloo only supports Python, with the [Poetry](https://python-poetry.org/docs/) package manager. If you're using pip instead of poetry, reach out and we can help you set up.
 
-types:
-  ## Search
-  SearchInput:
-    query: string
-    context: string
-  SearchOutput:
-    clues: list<string>
-    reasoning: string
-    answer: string
-```
+For updates on Typescript release, feel free to reach out at contact@trygloo.com
 
-Each input and output maps to a `type` defined in the `types` section.
+### Create a Gloo Project in the dashboard
 
-### Generate your Task Definitions
+Visit [beta.app.trygloo.com](https://beta.app.trygloo.com) and create a new project.
 
-Next we will use the **Gloo CLI** to generate your task definitions with this command:
+#### Setup environment variables
+
+On the dashboard, click on the project you created and go to "Keys". Note down the project ID and create a new secret to use as the APP SECRET below.
 
 ```bash
-npx @gloo-ai/client generate python --yaml tasks/tasks.yaml
+GLOO_APP_ID=proj_123...
+GLOO_APP_SECRET=gloo:your-key-from-dashboard
+OPENAI_API_KEY=your-open-ai-key
+# temporarily redirect to beta (production deployment coming soon)
+GLOO_BASE_URL=https://beta.app.trygloo.com/api
 ```
 
-This will generate a few files in your project:
+### Install the **Gloo CLI**
 
-```bash
-tasks/
-  task_search_documents/
-    v0/
-      generated.py
-      task.py
-      test.py # Coming soon
+```
+brew tap gloohq/gloo
+brew install gloo
 ```
 
-<Warning>
-  You must run this CLI anytime you change the tasks.yaml file. The CLI will
-  automatically create a new version of your task.py if it detects your new yaml
-  is incompatible with the existing task.py.
-</Warning>
+To update the CLI
 
-### Edit your generated Task Definition
-
-Now we can edit the generated `task.py`. At a glance, you will see a lot of commented out functions.
-Below we go over each of these functions and what they do.
-
-We will leverage the input variables defined in `task.yaml` schema to build our prompt, and we will ensure the output instructions can output the schema we desire.
-
-Recall that for our **Search** task the desired output schema is:
-
-```yaml
-SearchOutput:
-  clues: list<string>
-  reasoning: string
-  answer: string
+```
+brew update
+brew upgrade gloo
 ```
 
-Which translates to this JSON:
+### Install the **Gloo VSCode Extension**
 
-```json
-{
-  "clues": string[],
-  "reasoning": string,
-  "answer": string,
-}
+Search for gloo.gloo in the VSCode extension marketplace
+
+![Gloo Intellisense](/images/extension.png)
+
+### Initialize Gloo in your project
+
+```
+gloo init
 ```
 
-We now edit the prompt so our LLM actually spits out that output format.
+![](/images/glooinit.png)
 
-```python task.py
-  class search(GlooLLMTaskInterface):
-     # ...
+### Folder structure
 
-      def edit_llm_client(self) -> LLMClient:
-        return OpenAILLMClient(model_name="gpt-3.5-turbo", temperature=0)
-
-      def edit_prompt_template(self) -> str:
-          return f"""
-          Answer the question given using the following context:
-
-          Context: {VARS.in_SearchInput.context}
-          Question: {VARS.in_SearchInput.query}
-
-          Respond in the following format:
-          {
-            "clues": string[],
-            "reasoning": string,
-            "answer": string,
-          }
-
-          JSON:
-          """
-     # ...
-
-  async def run_v0(*, input: SearchInputModel) -> SearchOutputModel:
-      task = search()
-      return await task.run(input)
+```
+.
+├── app
+│   └── your application files
+├── gloo
+│   └── your gloo files live here
+├── pyproject.toml
+└── generated
+    └── translated, runnable python code from .gloo.
+          Don't edit these files.
 ```
 
-Note how we were able to refer to variables defined in the `task.yaml` **SearchInput** fields. These are all automatically generated, and as you guessed it, the output format can also be generated using your generated **SearchOutput** schema fields. This will generate the same text as above:
+## Gloo Lang Deep dive (5 min read)
 
-```string
-...
-Output in the following format:
+### Functions
 
-{
-  "{VARS.out_SearchOutput.clues}": string[],
-  "{VARS.out_SearchOutput.reasoning}": string,
-  "{VARS.out_SearchOutput.answer}": string,
-}
-...
-```
+Functions (and other unique types on GlooLang) start with an **@** symbol. They are the building blocks of your LLM pipeline.
 
-All of these variable substitutions are tracked by Gloo and can be tracked individually in the dashboard. Gloo will let you use this data to dive deep into potential issues caused by specific sections of your prompt. I.e. you could narrow down which part of your prompt causes the most impact in generating good or bad responses.
--- (dashboard link) --
+<img height="400" width="400" src="/images/function-classify-bool.png" />
 
-<Card title="Task.py" icon="lightbulb" iconType="duotone" color="#0aeb04">
+### Variants
 
-In general, view the `tasks.yaml` as a definition of _what_ tasks are, and the generated `task.py` files as definitions for _how_ they are executed. In the case of LLM apps, the "how" is done using prompt engineering and a combination of different LLM model parameters like temperature, etc. You can see both are defined in the next example.
+Variants specify how functions are executed. Functions are the blueprint as to what type of data they accept and return, and variants are the implementation of those functions.
+
+The following is an **LLM Variant** that prompts the model to take a string and return a boolean.
+
+<img src="/images/classify-sentiment-bool-llm-variant.png" />
+
+### Running a function
+
+To run a function in your code you have to import it from the generated folder. The generated folder is where the Gloo CLI translates your GlooLang files into runnable Python code.
+
+<img src="/images/running-yourself.png" />
+
+Press `control + space` on VSCode to get suggestions for all the functions you can run.
+
+<img src="/images/control-space-suggestions.png" />
+
+### Testing
+
+Gloo makes it easy to add function tests by declaring a test_group like below:
+
+<img src="/images/test-group1.png" />
+
+These get automatically compiled into Python code that you can run using pytest.
+
+You can declare as many different test groups as you want for a function. Each test group runs all variants of the function that have been declared.
+
+E.g. if you have 3 versions of a prompt, running the test will run all 3 variants so you can compare results.
+
+Note the **curly syntax** on Gloo:
+
+- inline data does not require \{\}
+- multi-line strings or data requires \{\}
+
+To run the test execute `pytest -s -k MyTests` in your terminal.
+
+<img src="/images/test-run-bool.png" />
+
+and view the results on the dashboard using the link
+
+<img src="/images/dashboardtest1.png" />
+
+#### Test assertions
+
+To assert a certain result from the output, declare a **@method** for your **@test_group** that takes in 2 special types: **InputType** and **OutputType**, which are the input and output types of your function. You can then use the **assert** keyword to assert a certain result.
+
+<img src="/images/test-group-validate.png" />
+
+<Card title="Inlining Python code" icon="lightbulb" iconType="duotone" color="#ca8b04">
+On GlooLang, you can write in-line python code using the **@lang[py]** identifier under **@method** statements. This gets copied to into the generated boilerplate code under `/generated`
 
 </Card>
 
-### Run the task
+<Tip>
+  We recommend writing the python functions in an actual python file and copying
+  them over. We are working on syntax highlighting and linting for these
+  statements.
+</Tip>
 
-```Python
-from tasks.task_search_documents import run_search_documents
-import asyncio
+### Prompt engineering on Gloo
 
-def run_search()
-  context = perform_semantic_search(query)
-  input = SearchInputModel(
-    query="What is the capital of France?",
-    context={context},
-  )
-  # Note you can run synchronous version by importing run_search_documents_sync instead.
-  output = asyncio.run(run_search_documents(input=input))
-  print(output)
-```
+The prompt can take a multi-line string inside a \{\} block. No need to escape common characters like quotes. If you want to escape a curly brace, use \{\{ and \}\}.
 
-### Advanced prompt engineering
+The prompt can leverage two special variables, the **@input** and **@output**.
 
-Recall the simple schema we have:
+The **@input** allows you to inject your input into the prompt. If your input is an object, you can access its properties using dot notation, such as **\{@input.text\}**.
 
-```
-  {
-    "clues": string[],
-    ...
-  }
-```
+The **@output** allows you to inject the output schema using **\{@output.json\}**
 
-Using `string[]` may not be the best description for `clues`. For example, you may want to indicate what kind of clues you want the model to actually output. Maybe you only want sentiment-based clues, or entities, or facts. We need something more than just declaring the type of `clues`. To do this, there a a couple of ways.
+See the below Example for a prompt defined inside an @variant\[llm\] for a function.
 
-#### 1. Add a "clues" instruction using a prompt template variable
+<img src="/images/extract-verbs/extract-verbs-nouns-example.png" />
 
-Instructions can be provided at the top of the prompt. Depending on the LLM model, performance may change by adding these at the beginning, rather than within the schema itself.
+and the end result
 
-To experiment with this... -TODO-
-
-#### 2. Use the Output -> JSON converter to define a custom description.
-
-Gloo comes with a built-in function called `edit_types_json_converter` that allows you to define the output format "description" and use it in your prompt.
-
-We will change the clues property in these ways:
-
-1. Change the name to "hints" in the prompt
-2. Add more information about what type of clues to retrieve.
-
-```python task.py
-class search(...)
-  def edit_types_json_converter(self) -> search__Description:
-    return {
-      "SearchOutput": {
-          "clues": {
-              "name": "hints",
-              "description": "string[], where each clue is an entity that will help answer the question in a factual way",
-          },
-          ... other fields search output ...
-      },
-    }
-
-  def edit_prompt_template()
-    return f'''
-    Answer the question given using the following context:
-
-    Context: {VARS.in_SearchInput.context}
-    Question: {VARS.in_SearchInput.query}
-
-    Respond in the following format:
-    {
-      "{VARS.out_SearchOutput.clues}": {VARS.out_SearchOutput.clues.desc},
-      "reasoning": string,
-      "answer": string,
-    }
-
-    JSON:
-    '''
-```
-
-Note we refer to the description using the variable: `{VARS.out_SearchOutput.clues.desc}`. Gloo gives you a reference to all your input and output variables, as well as their descriptions.
-
-Now that we've finished the edit, our prompt will now have the custom description and name.
-
-```string
-...
-{
-  "hints": string[], where each clue is an entity that will help answer the question in a factual way,
-  "reasoning": string,
-  "answer": string,
-}
-...
-```
-
-Even though this property is called "hints" in the prompt, the actual output of this task will contain a "clues" property (what was defined in our `tasks.yaml`). This allows you to prompt engineer more easily without having to change all your variable names all the time.
-
-## Testing
-
-(TODO)
+<img src="/images/extract-verbs/extract-verbs-prompt-dash.png" />
