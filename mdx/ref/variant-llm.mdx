@@ -24,25 +24,27 @@ A `@variant[llm]` is an implementation of a `@function` which uses an LLM. Gloo 
 
         Sentiment:
     }
+
 }
 
 @function GetSentiment {
-    @input string
-    @output Sentiment
+@input string
+@output Sentiment
 }
 
 @enum Sentiment {
-    Positive
-    Negative
-    Neutral
+Positive
+Negative
+Neutral
 }
 
 @client[llm] GPT35Client {
-    @provider openai
-    model gpt-3.5-turbo
-    temperature 0
+@provider openai
+model gpt-3.5-turbo
+temperature 0
 }
-```
+
+````
 
 ```python Python Equivalent
 from pydantic import BaseModel
@@ -79,7 +81,8 @@ def GetSentiment(arg: str) -> Sentiment:
 
     # This might crash if sentiment is not a valid Sentiment
     return Sentiment(sentiment)
-```
+````
+
 </CodeGroup>
 
 ## Type Safety (error handling)
@@ -89,41 +92,66 @@ Gloo uses our `Forgiving Parser` to help extract data as much as possible.
 Instead of directly passing the results of the LLM to pydantic or zod, we do a first
 pass to help massage the data. We'll outline some examples where this is useful.
 
-| LLM Output | Desired Type  | Gloo Output | How |
-| ---------- | ------------- | ----------- | --- |
-| positive | Sentiment | `Sentiment.Positive` | We handle case insensitivity |
-| \{ "feeling": "positive"\} | Sentiment | `Sentiment.Positive` | When looking for a singular value, we can parse dictionaries of 1 keys as singular objects |
-| positive | Sentiment[] | `[Sentiment.Positive]` | None array types are automatically converted |
+| LLM Output                 | Desired Type | Gloo Output            | How                                                                                        |
+| -------------------------- | ------------ | ---------------------- | ------------------------------------------------------------------------------------------ |
+| positive                   | Sentiment    | `Sentiment.Positive`   | We handle case insensitivity                                                               |
+| \{ "feeling": "positive"\} | Sentiment    | `Sentiment.Positive`   | When looking for a singular value, we can parse dictionaries of 1 keys as singular objects |
+| positive                   | Sentiment[]  | `[Sentiment.Positive]` | None array types are automatically converted                                               |
 
 This applies not just to `@enum` types, but all types ([See types](/mdx/ref/type)).
 
+## Injecting inputs into the prompt
 
-## Formatting variables
+### @input
 
-### `@input`
+`@input` allows you to pass in the function's input text (or object) to the LLM prompt
 
-`@input` allows you to format the input to the LLM.
+#### How @input behaves if it's a string or enum
 
-#### Primitive Types & Enums
+Using \{@input\} in your prompt is the equivalent of `str(arg)`.
 
-For these only `@input` is avaiable, which will inject the python equivalent of `str(arg)`.
+#### How @input behaves if it's a custom type
 
-#### `@class` Types
-If your input is a class, `@input` is still used to access `str(arg)`, but you can additionally do the following:
+Sometimes you might want to have your function take in an object. In this case, adding `{@input}` to your prompt is still used to access `str(your-object)`, but you can inject individual properties like this:
 
 `@input.property1` to inject `str(arg.property1)`
 
 This can be done with class `@method` as well ([See Methods](/mdx/ref/method#class)), with `@input.methodName`.
 
+### Formatting the @output
 
-### `@output` -- Using `@stringify`
+The @output is the function's return type.
 
-In LLMs it is often useful to rename or provide descriptions about the task you are attempting to do. For example,
-a property may be called `duration` but really is the duration in minutes.
+Using `{@output.json}` in the prompt is used to print out the JSON schema of the output type in your prompt.
+Gloo automatically generates a JSON schema for you, but you can customize it with `@stringify`.
 
-`@stringify` allows you to manage how an LLM should represent your data in the prompt.
+#### @stringify - Add a custom output schema description
 
-#### `@stringify` -- Enums
+In LLMs it is often useful to rename or provide descriptions about the task you are attempting to do. For example, you may want to rename a property from `duration` to `duration_in_minutes` so the LLM can understand what value it should output better.
+
+`@stringify` allows you to change the default JSON schema of any property or sub-property of your output type.
+
+You can use it to change the `@output.json` from being serialized as:
+
+```
+{
+  "duration": 10
+}
+```
+
+to
+
+```json
+{
+  "duration_in_minutes": 10
+}
+```
+
+without having to change your code or the actual type definition.
+
+`{@output.json}` will automatically parse all your @stringify'd properties and replace the default JSON schema with your own custom aliases and descriptions of each field.
+
+#### @stringify -- Enums
 
 You can use `@EnumName.values` to automatically inject all the `value: description` pairs of your enums.
 For values without a description, only `value` will be injected.
@@ -134,27 +162,29 @@ To modify the description of each value, see the examples below.
 ```gloo Ex 1: describe
 
 @enum Sentiment {
-    Positive
-    Negative
-    Neutral
+Positive
+Negative
+Neutral
 }
 
 @variant[llm] v1 for GetSentiment {
-    ...
-    @stringify Sentiment {
-        Positive
-        @describe{When the sentence is about good things that happened recently}
-        
+...
+@stringify Sentiment {
+Positive
+@describe{When the sentence is about good things that happened recently}
+
         Negative
         @describe{When the sentence is about bad things that happened recently}
-        
+
         Neutral
         @describe{
             Sentences that are neutral or happend too long ago to be relevant
         }
     }
+
 }
-```
+
+````
 ```gloo Ex 1: Prompt
 Given a sentence, return the sentiment of the sentence.
 
@@ -166,20 +196,20 @@ Negative: When the sentence is about bad things that happened recently
 Neutral: Sentences that are neutral or happend too long ago to be relevant
 
 Sentiment:
-```
+````
 
 ```gloo Ex 2: Rename
-# In this example, we rename what we call each `Sentiment` value, but still 
+# In this example, we rename what we call each `Sentiment` value, but still
 # guarantee the `Sentiment` enum as an output (thanks to Gloo's parser).
 @variant[llm] v2 for GetSentiment {
     ...
     @stringify Sentiment {
         Positive @rename{Good}
         @describe{When the sentence is about good things that happened recently}
-        
+
         Negative @rename{Bad}
         @describe{When the sentence is about bad things that happened recently}
-        
+
         Neutral
         @describe{Sentences that are neutral or happend too long ago to be relevant}
     }
@@ -206,10 +236,10 @@ Sentiment:
     @stringify Sentiment {
         Positive @rename{Good}
         @describe{When the sentence is about good things that happened recently}
-        
+
         Negative @rename{Bad}
         @describe{When the sentence is about bad things that happened recently}
-        
+
         Neutral @rename{Neither} @skip
         @describe{
             Sentences that are neutral or happend too long ago to be relevant
@@ -229,9 +259,10 @@ Bad: When the sentence is about bad things that happened recently
 
 Sentiment:
 ```
+
 </CodeGroup>
 
-#### `@stringify` -- Class
+#### @stringify -- Class
 
 Just like enums, you have access to `@describe` and `@rename` for class properties. `@skip` is not avaiable.
 
@@ -267,6 +298,7 @@ In all of the examples below, the output of the function will still be the type:
     }
 }
 ```
+
 ```gloo Ex 1: Prompt
 Given the sentence, return all the details about all people detected.
 
@@ -339,4 +371,5 @@ Output JSON:
 
 JSON:
 ```
+
 </CodeGroup>
