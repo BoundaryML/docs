@@ -32,7 +32,69 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["quickstart"]
+      "pages": [
+        "mdx/overview",
+        "mdx/installation",
+        "mdx/quickstart",
+        "mdx/running-tests"
+      ]
+    },
+    {
+      "group": "Concepts",
+      "pages": [
+        "mdx/what-is-gloo",
+        "mdx/why-gloo",
+        "mdx/should-you-use-gloo"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        {
+          "group": "Basic",
+          "pages": [
+            "mdx/examples/classification",
+            "mdx/examples/extraction",
+            "mdx/examples/translation",
+            "mdx/examples/summarization",
+            "mdx/examples/q-and-a"
+          ]
+        },
+        {
+          "group": "Advanced",
+          "pages": ["mdx/examples/chat-bot"]
+        }
+      ]
+    },
+    {
+      "group": "Reference",
+      "pages": [
+        {
+          "group": "Gloo Lang Syntax",
+          "pages": [
+            {
+              "group": "Types",
+              "pages": ["mdx/ref/type", "mdx/ref/enum", "mdx/ref/class"]
+            },
+            {
+              "group": "Functions",
+              "pages": [
+                "mdx/ref/function",
+                "mdx/ref/test-group",
+                {
+                  "group": "@variant",
+                  "pages": ["mdx/ref/variant-llm", "mdx/ref/variant-code"]
+                }
+              ]
+            },
+            {
+              "group": "clients",
+              "pages": ["mdx/ref/client-llm", "mdx/ref/client-code"]
+            },
+            "mdx/ref/method"
+          ]
+        }
+      ]
     }
   ],
   "footerSocials": {
