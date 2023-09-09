@@ -160,18 +160,16 @@ To modify the description of each value, see the examples below.
 
 <CodeGroup>
 ```gloo Ex 1: describe
-
 @enum Sentiment {
-Positive
-Negative
-Neutral
+    Positive
+    Negative
+    Neutral
 }
-
 @variant[llm] v1 for GetSentiment {
-...
-@stringify Sentiment {
-Positive
-@describe{When the sentence is about good things that happened recently}
+    ..
+    @stringify Sentiment {
+    Positive
+    @describe{When the sentence is about good things that happened recently}
 
         Negative
         @describe{When the sentence is about bad things that happened recently}
@@ -185,6 +183,7 @@ Positive
 }
 
 ````
+
 ```gloo Ex 1: Prompt
 Given a sentence, return the sentiment of the sentence.
 
