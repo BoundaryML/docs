@@ -1,6 +1,6 @@
 ## What is Gloo?
 
-Gloo is a toolkit that allows you to build and monitor LLM (or other ML model) pipelines using a **function-based** architecture, where every call to a model has a defined input and output schema. Gloo uses a unique language (GlooLang) to build your LLM functions in a few lines of code.
+Gloo is a toolkit that allows you to build and monitor LLM (or other ML model) pipelines using a **function-based** architecture, where every call to a model has a defined input and output schema. Gloo uses a unique configuration file (GlooConfig) define your LLM functions in just a few lines.
 
 If you’re building a chatbot, or any LLM application Gloo is a good way to decompose your task into specific observable tasks (classification, entity extraction, etc).
 
@@ -16,7 +16,7 @@ If you’re building a chatbot, or any LLM application Gloo is a good way to dec
 
 Gloo consists of the following parts:
 
-1. **Gloo Lang -** Human-readable schema designed to declare your LLM functions and their inputs and outputs.
+1. **Gloo Config -** Human-readable schema designed to declare your LLM functions and their inputs and outputs. In a more readable and maintanable way than yamls or plaintext files.
 2. **Gloo Intellisense VSCode Extension -** Enables GlooLang intellisense in VSCode
 3. **Gloo CLI -** Builds gloo-lang files into executable functions for Python (and soon Typescript).
 4. **Gloo Dashboard -** A dashboard where you can see Gloo-generated telemetry, like function call failure rates, etc.
@@ -97,11 +97,11 @@ gloo init
           Don't edit these files.
 ```
 
-## Gloo Lang Deep dive (5 min read)
+## Gloo Config Deep dive (5 min read)
 
 ### Functions
 
-Functions (and other unique types on GlooLang) start with an **@** symbol. They are the building blocks of your LLM pipeline.
+Functions (and other unique types on GlooConfig) start with an **@** symbol. They are the building blocks of your LLM pipeline.
 
 <img height="400" width="400" src="/images/function-classify-bool.png" />
 
@@ -160,7 +160,7 @@ To assert a certain result from the output, declare a **@method** for your **@te
 <img src="/images/test-group-validate.png" />
 
 <Card title="Inlining Python code" icon="lightbulb" iconType="duotone" color="#ca8b04">
-On GlooLang, you can write in-line python code using the **@lang[py]** identifier under **@method** statements. This gets copied to into the generated boilerplate code under `/generated`
+On GlooConfig, you can write in-line python code using the **@lang[py]** identifier under **@method** statements. This gets copied to into the generated boilerplate code under `/generated`
 
 </Card>
 
@@ -192,5 +192,5 @@ and the end result
 
 #### Modifying the output schema descriptions
 
-LLMs can use descriptions to figure out what to inject into each field in your output schema. In GlooLang we can accomplish
+LLMs can use descriptions to figure out what to inject into each field in your output schema. In GlooConfig we can accomplish
 this by using the @stringify keyword, which only works on the Function's @output types.

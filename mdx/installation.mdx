@@ -53,3 +53,30 @@ Use our [VSCode Exension](https://marketplace.visualstudio.com/items?itemName=gl
 <Info>It also works with [Cursor](https://cursor.so/)!</Info>
 
 <Warning>If you don't use the VSCode extension, you'll need to run: `gloo build` (no args) every time you edit a `.gloo` file.</Warning>
+
+
+
+### Initialize Gloo in your project
+
+```
+gloo init
+```
+
+This will create a gloo.yaml file
+
+![](/images/glooinit.png)
+
+### Folder structure
+
+```
+.
+|-- gloo.yaml
+├── app
+│   └── your application files
+├── gloo
+│   └── your gloo files live here
+├── pyproject.toml
+└── generated
+    └── translated, runnable python code from .gloo.
+          Don't edit these files.
+```
