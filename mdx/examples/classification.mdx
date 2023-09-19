@@ -112,7 +112,7 @@ You probably want to add some descriptions as to what each class in your enum ac
 
 In our case, we will rename all our classes to symbols, such as "K1, K2, K3" so that the LLM can focus on the class descriptions we provide more than the names of them. This is an interesting technique called "Symbol tuning".
 
-To do this we will leverage a unique property called **@stringify**. @stringify basically means "define how this class or object will be described to the LLM". **@stringify** works on any @enum or @class type that is part of your overall function's output schema.
+To do this we will leverage a unique property called **@stringify**. @stringify basically means "define how this class or object will be described to the LLM". **@stringify** works on any @enum or @class type that is part of your overall function's output schema. See the [@stringify](/mdx/ref/variant-llm#stringify-add-a-custom-output-schema-description) documentation for more details on how to format your output JSON.
 
 See below how it's used:
 
