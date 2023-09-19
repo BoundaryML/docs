@@ -2,10 +2,38 @@
 title: "Installation"
 ---
 
-## Gloo Compiler
+If you're only looking for Gloo's **tracing** and **test suite** functionality, all you need is the Gloo SDK. If you want to use **Gloo Configs** to declare your LLM pipelines, you'll need to install the Gloo CLI and Gloo VSCode Extension, which will setup the Gloo SDK for you.
 
-You'll need to install the gloo compiler -- `gloo` -- to your path.
+### Pre-requirements
 
+Currently Gloo only supports Python.
+
+For updates on Typescript release, feel free to reach out at contact@trygloo.com
+
+## Create a Gloo Project in the dashboard
+
+Visit [app.trygloo.com](https://app.trygloo.com) and create a new project. Skip this step if you don't want any dashboard functionality.
+
+## Install the Gloo SDK
+
+Skip this step if you want to use Gloo Configs. The Gloo CLI will install the SDK for you.
+
+<CodeGroup>
+```bash pip
+pip install gloo-lib
+```
+
+```bash poetry
+poetry add gloo-lib@latest
+```
+
+</CodeGroup>
+
+## Install Gloo Config functionality
+
+### Gloo CLI
+
+First, install the gloo CLI -- `gloo` -- to your path. This CLI tool helps translate your `.gloo` files into Python code.
 
 <CodeGroup>
 
@@ -13,7 +41,6 @@ You'll need to install the gloo compiler -- `gloo` -- to your path.
 brew tap gloohq/gloo
 brew install gloo
 ```
-
 
 ```bash Linux (debian)
 curl -fsSL https://raw.githubusercontent.com/GlooHQ/homebrew-gloo/main/install-gloo.sh | bash
@@ -24,6 +51,7 @@ curl -fsSL https://raw.githubusercontent.com/GlooHQ/homebrew-gloo/main/install-g
 scoop bucket add gloo-bucket https://github.com/gloohq/homebrew-gloo
 scoop install gloo
 ```
+
 </CodeGroup>
 
 ### Update instructions
@@ -34,7 +62,6 @@ scoop install gloo
 gloo update
 ```
 
-
 ```bash Linux (debian)
 curl -fsSL https://raw.githubusercontent.com/GlooHQ/homebrew-gloo/main/install-gloo.sh | bash
 ```
@@ -43,8 +70,8 @@ curl -fsSL https://raw.githubusercontent.com/GlooHQ/homebrew-gloo/main/install-g
 scoop update
 scoop update gloo
 ```
-</CodeGroup>
 
+</CodeGroup>
 
 ## Gloo Extension
 
@@ -52,9 +79,10 @@ Use our [VSCode Exension](https://marketplace.visualstudio.com/items?itemName=gl
 
 <Info>It also works with [Cursor](https://cursor.so/)!</Info>
 
-<Warning>If you don't use the VSCode extension, you'll need to run: `gloo build` (no args) every time you edit a `.gloo` file.</Warning>
-
-
+<Warning>
+  If you don't use the VSCode extension, you'll need to run: `gloo build` (no
+  args) every time you edit a `.gloo` file.
+</Warning>
 
 ### Initialize Gloo in your project
 
@@ -80,3 +108,5 @@ This will create a gloo.yaml file
     └── translated, runnable python code from .gloo.
           Don't edit these files.
 ```
+
+Now you're all setup! Proceed to the [Running Tests](/mdx/running-tests) section to learn how to run your first test.

@@ -1,0 +1,30 @@
+Gloo is a toolkit that allows you to build and monitor LLM or other custom model pipelines to measure their performance and accuracy.
+
+To start sending LLM-generated data you just need to add a simple decorator to your functions:
+
+```python
+from gloo_py import trace
+
+@trace()
+def call_llm(message: str):
+    # Call an LLM here!
+    return "How may I assist you?"
+```
+
+Gloo will automatically generate telemetry for your LLM functions, and you can start monitoring them in the Gloo Dashboard.
+
+<img src="/images/dashboard/dashboard-test-pic.png" width="auto" />
+
+Gloo also provides a **custom schema language** that allows you to declare your LLM functions and their inputs and outputs in a human-readable way, provding you with better code organization, smarter parsing, and out-of-the-box analytics capabilities for all your LLM functions.
+
+Example Gloo Schema for a sentiment classifier using an LLM:
+
+<img src="/images/classify-sentiment-bool-llm-variant.png" width="auto" />
+
+Gloo saves hundreds of lines of code in telemetry, serialization and deserialization logic.
+
+Gloo consists of the following parts:
+
+1. **Gloo SDK -** Includes tracing functionality for LLM pipelines, and allows you to build powerful test suites
+1. **Gloo Config -** Human-readable schema designed to declare your LLM functions and their inputs and outputs in a more organized way. Our VSCode extension and can help you validate your LLM prompts for potential issues.
+1. **Gloo Dashboard -** A dashboard where you can see Gloo-generated telemetry and label your data for fine-tuning more accurate models.

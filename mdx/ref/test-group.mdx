@@ -1,6 +1,11 @@
 ---
-title: '@test_group'
+title: "@test_group"
 ---
+
+<Warning>
+  This feature is deprecated. Please see [Running tests](/mdx/running-tests) for
+  the new way to run tests using native python code and pytest.
+</Warning>
 
 Test groups offer a way to create tests for [@function](/mdx/ref/function) definitions that test every [@variant](/mdx/ref/variant-llm).
 
@@ -40,33 +45,35 @@ class TestGroupName:
             await GetSentimentV2(arg)
 ```
 
-```typescript TypeScript Equivalent (jest)
-import { GetSentimentV1, GetSentimentV2 } from 'path/to/GetSentiment';
+````typescript TypeScript Equivalent (jest)
+import { GetSentimentV1, GetSentimentV2 } from "path/to/GetSentiment";
 
-describe('GroupName', () => {
-  test.each(['v1', 'v2'])('test_case_0 - %s', async (version) => {
+describe("GroupName", () => {
+  test.each(["v1", "v2"])("test_case_0 - %s", async (version) => {
     const arg = "Some string goes here";
-    if (version === 'v1') {
+    if (version === "v1") {
       await GetSentimentV1(arg);
-    } else if (version === 'v2') {
+    } else if (version === "v2") {
       await GetSentimentV2(arg);
     }
   });
 
-  test.each(['v1', 'v2'])('test_case_1 - %s', async (version) => {
+  test.each(["v1", "v2"])("test_case_1 - %s", async (version) => {
     const arg = ```Some multiline string
       goes here.```;
-    if (version === 'v1') {
+    if (version === "v1") {
       await GetSentimentV1(arg);
-    } else if (version === 'v2') {
+    } else if (version === "v2") {
       await GetSentimentV2(arg);
     }
   });
 });
-```
+````
+
 </CodeGroup>
 
 ## Properties
+
 `@test_group` names must be unique per function, but can be reused across multiple functions.
 
 ### @input
@@ -80,6 +87,7 @@ Anytime you wish to add properties on a per test case basis, you can use the `@c
 This can includes things like naming a test case, or adding a custom assert method for that test case.
 
 #### @case names
+
 If you'd like to name an individual test case, you can use the `@case` decorator.
 
 <CodeGroup>
@@ -118,32 +126,32 @@ class TestGroupName:
             await GetSentimentV2(arg)
 ```
 
-```typescript TypeScript Equivalent (jest)
-import { GetSentimentV1, GetSentimentV2 } from 'path/to/GetSentiment';
+````typescript TypeScript Equivalent (jest)
+import { GetSentimentV1, GetSentimentV2 } from "path/to/GetSentiment";
 
-describe('GroupName', () => {
-  test.each(['v1', 'v2'])('SpecialTestCase - %s', async (version) => {
+describe("GroupName", () => {
+  test.each(["v1", "v2"])("SpecialTestCase - %s", async (version) => {
     const arg = "Some string goes here";
-    if (version === 'v1') {
+    if (version === "v1") {
       await GetSentimentV1(arg);
-    } else if (version === 'v2') {
+    } else if (version === "v2") {
       await GetSentimentV2(arg);
     }
   });
 
-  test.each(['v1', 'v2'])('test_case_1 - %s', async (version) => {
+  test.each(["v1", "v2"])("test_case_1 - %s", async (version) => {
     const arg = ```Some multiline string
       goes here.```;
-    if (version === 'v1') {
+    if (version === "v1") {
       await GetSentimentV1(arg);
-    } else if (version === 'v2') {
+    } else if (version === "v2") {
       await GetSentimentV2(arg);
     }
   });
 });
-```
-</CodeGroup>
+````
 
+</CodeGroup>
 
 ### @method (custom asserts)
 
@@ -166,10 +174,14 @@ Gloo will run that assert on every test case in that `@test_group`.
 }
 ```
 
-
-<Tip>Instead of `def assert1(arg: str, result: Sentiment):` you can use  `def assert1(arg: InputType, result: OutputType):`. Gloo defines `InputType` and `OutputType` in the scope of every `@method` for a `@test_group`</Tip>
+<Tip>
+  Instead of `def assert1(arg: str, result: Sentiment):` you can use `def
+  assert1(arg: InputType, result: OutputType):`. Gloo defines `InputType` and
+  `OutputType` in the scope of every `@method` for a `@test_group`
+</Tip>
 
 #### @case asserts
+
 For an assert on a single test case, you can use `@method` scoped to `@case`.
 
 <CodeGroup>
